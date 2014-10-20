@@ -6,8 +6,8 @@
   "keywords": ["event", "emitter", "listener", "dispatcher", "emit"],
   "description": "Not your average emitter!",
   "main": "emitter.js",
-  "repository": "https://github.com/digitaledgeit/emitter-on-steroids.git",
-  "bugs": "https://github.com/digitaledgeit/emitter-on-steroids/issues",
+  "repository": "https://github.com/digitaledgeit/js-emitter-on-steroids.git",
+  "bugs": "https://github.com/digitaledgeit/js-emitter-on-steroids/issues",
   "licenses": [{"type": "MIT", "url": "http://www.opensource.org/licenses/MIT"}],
   "devDependencies": {
     "mocha": "^1.21.5"
