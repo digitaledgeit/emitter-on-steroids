@@ -1,26 +1,66 @@
 var emitter = require('../emitter');
 
+// === Synchronous listener ===
+
+emitter()
+  .on('test', function() {
+    console.log('listener #1');
+  })
+  .emit('test')
+;
+
+// === Asynchronous listener ===
+
+emitter()
+  .on('test', function(event, done) {
+    setTimeout(function() {
+      console.log('listener #1');
+      done();
+    }, 1000);
+  })
+  .emit('test')
+;
+
+// === Global listener ===
+
+emitter()
+  .on('*', function() {
+    console.log('listener #1');
+  })
+  .emit('test')
+;
+
+// === Stoppable event ===
+
 emitter()
   .on('test', function(event) {
-    console.log('test listener 1');
+    console.log('listener #1');
+    event.stopPropagation();
   })
-  //.on('test', function(event, done) {
-  //  setTimeout(function() {
-  //    //event.stopPropagation();
-  //    console.log('test listener 2');
-  //    done();
-  //  }, 1000);
-  //})
-  .once('test', function() {
-    console.log('test listener 3');
+  .on('test', function() {
+    console.log('listener #2');
   })
-  .once('test', function() {
-    console.log('test listener 4');
+  .emit('test')
+;
+
+// === Error handling ===
+
+emitter()
+  .on('test', function() {
+    console.log('listener #1');
+    throw new Error('A test error');
   })
-  .emit('test', function() {
-    console.log('DONE');
+  .emit('test', function(err) {
+    console.log('done', err);
   })
-  .emit('test', function() {
-    console.log('DONE');
+;
+
+emitter()
+  .on('test', function(event, done) {
+    console.log('listener #1');
+    done(new Error('A test error'));
+  })
+  .emit('test', function(err) {
+    console.log('done', err);
   })
 ;

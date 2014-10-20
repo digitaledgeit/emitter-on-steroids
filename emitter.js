@@ -1,4 +1,4 @@
-var Event = require('./event');
+var events = require('./events');
 
 /**
  * An event emitter
@@ -47,8 +47,8 @@ EventEmitter.prototype.on = function(name, listener) {
 
 /**
  * Add an event listener that listens to a single event before removing itself
- * @param   {String}    name        The event name
- * @param   {Function}  listener    The event listener
+ * @param   {String}                                name        The event name
+ * @param   {Function(Event, [Function([Error])]}   listener    The event listener
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.once = function(name, listener) {
@@ -65,8 +65,8 @@ EventEmitter.prototype.once = function(name, listener) {
 
 /**
  * Remove an event listener
- * @param   {String}    name        The event name
- * @param   {Function}  listener    The event listener
+ * @param   {String}                                name        The event name
+ * @param   {Function(Event, [Function([Error])]}   listener    The event listener
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.off = function(name, listener) {
@@ -88,7 +88,7 @@ EventEmitter.prototype.off = function(name, listener) {
 /**
  * Emit an event
  * @param   {String|Event}              event
- * @param   {Function(Event)}           [done]
+ * @param   {Function(Error, [Event])}  [done]
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.emit = function(event, done) {
@@ -98,11 +98,10 @@ EventEmitter.prototype.emit = function(event, done) {
   var name;
   if (typeof(event) === 'string') {
     name  = event;
-    event = new Event();
+    event = new events.Event(name);
   } else {
     name = event.getName();
   }
-  event.name    = name;
   event.emitter = this;
 
   // --- if there are no listeners listening for this event then we're done ---
@@ -129,19 +128,30 @@ EventEmitter.prototype.emit = function(event, done) {
 
   var self=this, i=0;
 
-  function callNextListener() {
+  function callNextListener(err) {
+
+    if (err) {
+
+      //we're done
+      if (done) done(err, event);
+
+      //stop
+      return;
+
+    }
 
     //while there are more listeners to call
     if (listeners.length > 0 && i < listeners.length) {
 
       //check if we should stop
-      if (event.isPropagationStopped()) {
+      if (typeof(event.isPropagationStopped) === 'function' && event.isPropagationStopped()) {
 
         //we're done
-        if (done) done(event);
+        if (done) done(err, event);
 
         //stop
         return;
+
       }
 
       //get the next event listener
@@ -152,8 +162,12 @@ EventEmitter.prototype.emit = function(event, done) {
 
       //call the event listener synchronously or asynchronously
       if (callback.length <= 1) {
-        callback(event); //sync
-        callNextListener();
+        try {
+          callback(event); //sync
+          callNextListener();
+        } catch(err) {
+          callNextListener(err);
+        }
       } else {
         callback(event, callNextListener); //async
       }
@@ -161,7 +175,10 @@ EventEmitter.prototype.emit = function(event, done) {
     } else {
 
       //we're done
-      if (done) done(event);
+      if (done) done(err, event);
+
+      //stop
+      return;
 
     }
 
@@ -173,5 +190,7 @@ EventEmitter.prototype.emit = function(event, done) {
   return this;
 };
 
+EventEmitter.Event = events.Event;
+EventEmitter.StoppableEvent = events.StoppableEvent;
 
 module.exports = EventEmitter;
