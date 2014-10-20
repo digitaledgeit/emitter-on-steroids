@@ -1,5 +1,5 @@
 var assert  = require('assert');
-var emitter = require('emitter-on-steroids');
+var emitter = require('..');
 
 describe('EventEmitter', function() {
 

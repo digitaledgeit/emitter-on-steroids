@@ -1,0 +1,10 @@
+{
+  "name": "emitter-on-steroids",
+  "main": "emitter.js",
+  "scripts": ["emitter.js", "events.js"],
+  "development": {
+    "dependencies": {
+      "component/assert": "*"
+    }
+  }
+}

@@ -148,3 +148,9 @@ Whether the event has been stopped from propagating.
 #### .stopPropagation()
 
 Stops the event from propagating.
+
+## License
+
+The MIT License (MIT)
+
+Copyright (c) 2014 Digital Edge IT <info@digitaledgeit.com.au>
