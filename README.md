@@ -21,7 +21,7 @@ or
 or
 	
 	var MyClass = function() {}
-	emitter(MyClass);
+	emitter(MyClass.prototype);
 	var emitter3 = new MyClass();
 
 ### Global listeners
