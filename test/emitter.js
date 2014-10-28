@@ -48,8 +48,45 @@ describe('EventEmitter', function() {
       assert.equal('second', called[0]);
     });
 
+    it('should throw if listener is not a function', function() {
+
+      assert.throws(function() {
+        emitter().off('test');
+      });
+
+      assert.throws(function() {
+        emitter().off('test', 'test');
+      });
+
+      assert.throws(function() {
+        emitter().off('test', 1);
+      });
+
+    });
+
   });
 
+  // ===================================================================
+
+  describe('.on()', function() {
+
+    it('should throw if listener is not a function', function() {
+
+      assert.throws(function() {
+        emitter().on('test');
+      });
+
+      assert.throws(function() {
+        emitter().on('test', 'test');
+      });
+
+      assert.throws(function() {
+        emitter().on('test', 1);
+      });
+
+    });
+
+  });
 
   // ===================================================================
 
@@ -85,6 +122,49 @@ describe('EventEmitter', function() {
 
       assert.equal(2, first);
       assert.equal(1, second);
+    });
+
+    it('should throw if listener is not a function', function() {
+
+      assert.throws(function() {
+        emitter().once('test');
+      });
+
+      assert.throws(function() {
+        emitter().once('test', 'test');
+      });
+
+      assert.throws(function() {
+        emitter().once('test', 1);
+      });
+
+    });
+
+  });
+
+  // ===================================================================
+
+  describe('.emit()', function() {
+
+    it('should not throw if done is undefined or a function', function(done) {
+
+      emitter().emit('test');
+      emitter().emit('test', function() {
+        done();
+      });
+
+    });
+
+    it('should throw if done is not undefined and not a function', function() {
+
+      assert.throws(function() {
+        emitter().emit('test', 'test');
+      });
+
+      assert.throws(function() {
+        emitter().emit('test', 1);
+      });
+
     });
 
   });

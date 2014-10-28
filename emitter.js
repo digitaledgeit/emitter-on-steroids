@@ -1,5 +1,17 @@
 var events = require('./events');
 
+function assertFn(fn, msg) {
+  if (typeof(fn) !== 'function') {
+    throw new Error(msg);
+  }
+}
+
+function assertFnOrUndefined(fn, msg) {
+  if (typeof(fn) !== 'undefined') {
+    assertFn(fn, msg);
+  }
+}
+
 /**
  * An event emitter
  * @constructor
@@ -16,6 +28,7 @@ function EventEmitter() {
           arguments[0][key] = EventEmitter.prototype[key];
         }
       }
+      return arguments[0];
     }
   }
 
@@ -28,6 +41,7 @@ function EventEmitter() {
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.on = function(name, listener) {
+  assertFn(listener, '`listener` parameter must be a function.');
 
   //create the event listener hash if it doesn't already exist
   if (!this._listeners) {
@@ -52,8 +66,9 @@ EventEmitter.prototype.on = function(name, listener) {
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.once = function(name, listener) {
-  var self = this;
+  assertFn(listener, '`listener` parameter must be a function.');
 
+  var self = this;
   function once() {
     self.off(name, once);
     listener.apply(this, arguments);
@@ -70,6 +85,7 @@ EventEmitter.prototype.once = function(name, listener) {
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.off = function(name, listener) {
+  assertFn(listener, '`listener` parameter must be a function.');
 
   //check the event listener hash already exists
   if (!this._listeners || !this._listeners[name]) {
@@ -92,6 +108,7 @@ EventEmitter.prototype.off = function(name, listener) {
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.emit = function(event, done) {
+  assertFnOrUndefined(done, '`done` parameter must be a function');
 
   // --- setup the event ---
 
