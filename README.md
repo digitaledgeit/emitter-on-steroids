@@ -4,8 +4,8 @@ Not your average emitter. An event emitter with the following features:
 
 - global listeners
 - synchronous and asynchronous listeners
-- stoppable events
 - error handling
+- formal events, stoppable events
 - works in the browser too
 
 ## Example
@@ -40,19 +40,40 @@ are called before regular listeners.
 
 	emitter()
 	  .on('test', function() {
-        console.log('listener #1');
+        console.log('listener #1 - synchronous');
       })
-	  .on('test', function(event, done) {
-	    console.log('listener #2');
-        done();
+	  .on('test', function(done) {
+	  	setTimeout(function() {
+	  		console.log('listener #2 - asynchronous');
+	  		done();
+	  	}, 1);
 	  })
 	  .emit('test', function() {
 	    //called after all listeners have finished
 	  })
 	;
 
+### Formal events
+
+	var Event = require('emitter-on-steroids/events').Event;
+
+	emitter()
+	  .on('test', function(event) { //the event object is passed as the first argument
+	    console.log('listener #1');
+	  })
+	  .on('test', function(event, done) { //the event object is passed as the first argument
+	    console.log('listener #2');
+	    done();
+	  })
+	  .emit(new StoppableEvent('test'), function(err, event) { //the event object is passed as the second argument
+
+	  })
+	;
+
 ### Stoppable events
-	
+
+	var StoppableEvent = require('emitter-on-steroids/events').StoppableEvent;
+
 	emitter()
 	  .on('test', function(event) {
 	    console.log('listener #1');
@@ -61,7 +82,7 @@ are called before regular listeners.
 	  .on('test', function() {
 	    console.log('listener #2');
 	  })
-	  .emit(new emitter.StoppableEvent('test'))
+	  .emit(new StoppableEvent('test'))
 	;
 
 
@@ -116,7 +137,7 @@ Register a listener to receive notifications the next time an event is emitted.
 
 Un-register a listener from receiving notifications each time an event is emitted.
 
-#### .emit(event : String|Event, [done : Function(Event)]))
+#### .emit(event : String|Event, [arg1, arg2, ...], [done : Function(Event)]))
 
 Notifies listeners that an event occurred.
 

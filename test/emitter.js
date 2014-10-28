@@ -1,72 +1,9 @@
-var assert  = require('assert');
-var emitter = require('..');
+var assert          = require('assert');
+var emitter         = require('..');
+var Event           = require('../events').Event;
+var StoppableEvent  = require('../events').StoppableEvent;
 
 describe('EventEmitter', function() {
-
-  describe('.off()', function() {
-
-    it('should remove the first listener', function() {
-      var called = [];
-
-      function first() {
-        called.push('first');
-      }
-
-      function second() {
-        called.push('second');
-      }
-
-      emitter()
-        .on('test', first)
-        .on('test', second)
-        .off('test', first)
-        .emit('test')
-      ;
-
-      assert.equal(1, called.length);
-      assert.equal('second', called[0]);
-    });
-
-    it('shouldn\'t remove any listeners', function() {
-      var called = [];
-
-      function first() {
-        called.push('first');
-      }
-
-      function second() {
-        called.push('second');
-      }
-
-      emitter()
-        .on('test', second)
-        .off('test', first)
-        .emit('test')
-      ;
-
-      assert.equal(1, called.length);
-      assert.equal('second', called[0]);
-    });
-
-    it('should throw if listener is not a function', function() {
-
-      assert.throws(function() {
-        emitter().off('test');
-      });
-
-      assert.throws(function() {
-        emitter().off('test', 'test');
-      });
-
-      assert.throws(function() {
-        emitter().off('test', 1);
-      });
-
-    });
-
-  });
-
-  // ===================================================================
 
   describe('.on()', function() {
 
@@ -144,26 +81,114 @@ describe('EventEmitter', function() {
 
   // ===================================================================
 
-  describe('.emit()', function() {
+  describe('.off()', function() {
 
-    it('should not throw if done is undefined or a function', function(done) {
+    it('should remove the first listener', function() {
+      var called = [];
 
-      emitter().emit('test');
-      emitter().emit('test', function() {
-        done();
+      function first() {
+        called.push('first');
+      }
+
+      function second() {
+        called.push('second');
+      }
+
+      emitter()
+        .on('test', first)
+        .on('test', second)
+        .off('test', first)
+        .emit('test')
+      ;
+
+      assert.equal(1, called.length);
+      assert.equal('second', called[0]);
+    });
+
+    it('shouldn\'t remove any listeners', function() {
+      var called = [];
+
+      function first() {
+        called.push('first');
+      }
+
+      function second() {
+        called.push('second');
+      }
+
+      emitter()
+        .on('test', second)
+        .off('test', first)
+        .emit('test')
+      ;
+
+      assert.equal(1, called.length);
+      assert.equal('second', called[0]);
+    });
+
+    it('should throw if listener is not a function', function() {
+
+      assert.throws(function() {
+        emitter().off('test');
+      });
+
+      assert.throws(function() {
+        emitter().off('test', 'test');
+      });
+
+      assert.throws(function() {
+        emitter().off('test', 1);
       });
 
     });
 
-    it('should throw if done is not undefined and not a function', function() {
+  });
 
-      assert.throws(function() {
-        emitter().emit('test', 'test');
-      });
+  // ===================================================================
 
-      assert.throws(function() {
-        emitter().emit('test', 1);
-      });
+  describe('.emit()', function() {
+
+    it('should pass arguments to sync listener', function() {
+      var d=3, e=2, f=3;
+
+      emitter()
+        .on('test', function(a, b, c) {
+          assert.equal(d, a);
+          assert.equal(e, b);
+          assert.equal(f, c);
+        })
+        .emit('test', d, e, f)
+      ;
+
+    });
+
+    it('should pass arguments to async listener', function(testdone) {
+      var d=3, e=2, f=3;
+
+      emitter()
+        .on('test', function(a, b, c, done) {
+          assert.equal(d, a);
+          assert.equal(e, b);
+          assert.equal(f, c);
+          assert.equal('function', typeof(done));
+          done();
+        })
+        .emit('test', d, e, f, testdone)
+      ;
+
+    });
+
+    it('should pass arguments to done callback', function() {
+      var d=3, e=2, f=3;
+
+      emitter()
+        .emit('test', d, e, f, function(err, a, b, c) {
+          assert.equal(undefined, err);
+          assert.equal(d, a);
+          assert.equal(e, b);
+          assert.equal(f, c);
+        })
+      ;
 
     });
 
@@ -199,13 +224,9 @@ describe('EventEmitter', function() {
     it('should call listener with an event object and then call done', function() {
       var called = false;
 
-      var that = emitter();
-      that
-        .on('test', function(event) {
+      emitter()
+        .on('test', function() {
           called = true;
-          assert.equal('test',  event.getName());
-          assert.equal(that,    event.getEmitter());
-          assert.equal('function', typeof(done));
         })
         .emit('test', function() {
           assert(called);
@@ -220,15 +241,12 @@ describe('EventEmitter', function() {
 
   describe('Asynchronous', function() {
 
-    it('should call listener with an event object and a done method and then call done', function(testdone) {
+    it('should call listener and then call done', function(testdone) {
       var called = false;
 
-      var that = emitter();
-      that
-        .on('test', function(event, done) {
+      emitter()
+        .on('test', function(done) {
           called = true;
-          assert.equal('test',  event.getName());
-          assert.equal(that,    event.getEmitter());
           assert.equal('function', typeof(done));
           done();
         })
@@ -244,7 +262,28 @@ describe('EventEmitter', function() {
 
   // ===================================================================
 
-  describe('Stoppable', function() {
+  describe('Formal', function() {
+
+    it('should pass event object as first arg to listener', function() {
+
+      emitter()
+        .on('test', function(event) {
+          assert.equal('test', event.getName());
+        })
+        .emit(new Event('test'))
+      ;
+
+    });
+
+    it('should pass event object as first arg to done callback', function() {
+
+      emitter()
+        .emit(new Event('test'), function(err, event) {
+          assert.equal('test', event.getName());
+        })
+      ;
+
+    });
 
     it('should stop event propagation', function() {
       var count = 0;
@@ -257,7 +296,9 @@ describe('EventEmitter', function() {
         .on('test', function() {
           ++count;
         })
-        .emit(new emitter.StoppableEvent('test'))
+        .emit(new StoppableEvent('test'), function(err, event) {
+          assert(event.isPropagationStopped());
+        })
       ;
 
       assert.equal(1, count);
@@ -283,7 +324,7 @@ describe('EventEmitter', function() {
 
     it('an error returned from an async listener should result in an error being passed to the done function', function (testdone) {
       emitter()
-        .on('test', function(event, done) {
+        .on('test', function(done) {
           setTimeout(function() {
             done(new Error('A test error'));
           }, 0);

@@ -1,14 +1,7 @@
-var events = require('./events');
 
 function assertFn(fn, msg) {
   if (typeof(fn) !== 'function') {
     throw new Error(msg);
-  }
-}
-
-function assertFnOrUndefined(fn, msg) {
-  if (typeof(fn) !== 'undefined') {
-    assertFn(fn, msg);
   }
 }
 
@@ -33,6 +26,24 @@ function EventEmitter() {
   }
 
 }
+
+/**
+ * Get the registered listeners
+ * @param   {String}    name        The event name
+ * @returns {EventEmitter}
+ */
+EventEmitter.prototype.listeners = function(event){
+
+  if (!this._listeners) {
+    return []
+  }
+
+  if (!this._listeners[name]) {
+    return [];
+  }
+
+  return [].concat(this._listeners[name]);
+};
 
 /**
  * Add an event listener
@@ -103,29 +114,38 @@ EventEmitter.prototype.off = function(name, listener) {
 
 /**
  * Emit an event
- * @param   {String|Event}              event
- * @param   {Function(Error, [Event])}  [done]
+ * @param   {String|Event}                          event
+ * @param   {...[*]}                                [args]
+ * @param   {Function(Error, [Event])}              [done]
  * @returns {EventEmitter}
  */
-EventEmitter.prototype.emit = function(event, done) {
-  assertFnOrUndefined(done, '`done` parameter must be a function');
+EventEmitter.prototype.emit = function() {
+  var
+    args      = Array.prototype.slice.call(arguments, 0),
+    event     = args.shift(),
+    done,
+    formal    = typeof(event) === 'object' && typeof(event.getName) === 'function',
+    stoppable = formal && typeof(event.isPropagationStopped) === 'function'
+  ;
 
-  // --- setup the event ---
-
-  var name;
-  if (typeof(event) === 'string') {
-    name  = event;
-    event = new events.Event(name);
-  } else {
-    name = event.getName();
+  //check if a done() callback was passed
+  if (args.length > 0 && typeof(args[args.length-1]) === 'function') {
+    done = args.pop();
   }
-  event.emitter = this;
+
+  //get the event name
+  var name;
+  if (formal) {
+    name = event.getName();
+    args.unshift(event);
+  } else {
+    name = String(event);
+  }
 
   // --- if there are no listeners listening for this event then we're done ---
 
   if (!this._listeners || (!this._listeners['*'] && !this._listeners[name])) {
-
-    if (done) done(event);
+    if (done) done.apply(this, [].concat(undefined, args));
     return this;
   }
 
@@ -147,56 +167,49 @@ EventEmitter.prototype.emit = function(event, done) {
 
   function callNextListener(err) {
 
+    //check if an error has occurred
     if (err) {
 
       //we're done
-      if (done) done(err, event);
-
-      //stop
+      if (done) done.apply(this, [].concat(err, args));
       return;
 
     }
 
-    //while there are more listeners to call
-    if (listeners.length > 0 && i < listeners.length) {
-
-      //check if we should stop
-      if (typeof(event.isPropagationStopped) === 'function' && event.isPropagationStopped()) {
-
-        //we're done
-        if (done) done(err, event);
-
-        //stop
-        return;
-
-      }
-
-      //get the next event listener
-      var callback = listeners[i];
-
-      //move to the next event listener
-      ++i;
-
-      //call the event listener synchronously or asynchronously
-      if (callback.length <= 1) {
-        try {
-          callback(event); //sync
-          callNextListener();
-        } catch(err) {
-          callNextListener(err);
-        }
-      } else {
-        callback(event, callNextListener); //async
-      }
-
-    } else {
+    //check if event propagation has stopped
+    if (stoppable && event.isPropagationStopped()) {
 
       //we're done
-      if (done) done(err, event);
-
-      //stop
+      if (done) done.apply(this, [].concat(err, args));
       return;
 
+    }
+
+    //check if there are more listeners we should call
+    if (listeners.length === 0 || i >= listeners.length) {
+
+      //we're done
+      if (done) done.apply(this, [].concat(err, args));
+      return;
+
+    }
+
+    //get the next event listener
+    var callback = listeners[i];
+
+    //move to the next event listener
+    ++i;
+
+    //call the event listener synchronously or asynchronously
+    if (callback.length <= args.length) {
+      try {
+        callback.apply(this, args); //sync
+        callNextListener();
+      } catch(err) {
+        callNextListener(err);
+      }
+    } else {
+      callback.apply(this, args.concat(callNextListener)); //async
     }
 
   }
@@ -206,8 +219,5 @@ EventEmitter.prototype.emit = function(event, done) {
 
   return this;
 };
-
-EventEmitter.Event = events.Event;
-EventEmitter.StoppableEvent = events.StoppableEvent;
 
 module.exports = EventEmitter;
