@@ -142,6 +142,11 @@ EventEmitter.prototype.emit = function() {
     name = String(event);
   }
 
+  //assert event name is not empty
+  if (name === '') {
+    throw new Error('`name` parameter cannot be empty.');
+  }
+
   // --- if there are no listeners listening for this event then we're done ---
 
   if (!this._listeners || (!this._listeners['*'] && !this._listeners[name])) {
