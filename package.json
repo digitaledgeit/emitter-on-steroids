@@ -1,6 +1,6 @@
 {
   "name": "emitter-on-steroids",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "James Newell <james@digitaledgeit.com.au",
   "contributors": [],
   "keywords": ["event", "emitter", "listener", "dispatcher", "emit"],

@@ -143,7 +143,7 @@ EventEmitter.prototype.emit = function() {
   }
 
   //assert event name is not empty
-  if (name === '') {
+  if (typeof(name) !== 'string' || !name.length) {
     throw new Error('`name` parameter cannot be empty.');
   }
 
