@@ -72,7 +72,7 @@ are called before regular listeners.
 
 ### Stoppable events
 
-	var StoppableEvent = require('emitter-on-steroids/events').StoppableEvent;
+	var Event = require('emitter-on-steroids/event');
 
 	emitter()
 	  .on('test', function(event) {
@@ -82,7 +82,7 @@ are called before regular listeners.
 	  .on('test', function() {
 	    console.log('listener #2');
 	  })
-	  .emit(new StoppableEvent('test'))
+	  .emit(Event.stoppable(new Event('test')))
 	;
 
 
