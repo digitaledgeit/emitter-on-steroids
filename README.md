@@ -151,24 +151,15 @@ Get the event name.
 
 Get the event emitter.
 
+#### #preventable(object)
 
-### StoppableEvent
+- .isDefaultPreventable() - Get whether the default event action has been prevented.
+- .preventDefault() - Prevent the default event action from executing.
 
-#### .getName()
+#### #stoppable(object)
 
-Get the event name.
-
-#### .getEmitter()
-
-Get the event emitter.
-
-#### .isPropagationStopped()
-
-Whether the event has been stopped from propagating.
-
-#### .stopPropagation()
-
-Stops the event from propagating.
+- .isPropagationStopped() - Whether the event has been stopped from propagating.
+- .stopPropagation() - Stops the event from propagating.
 
 ## License
 

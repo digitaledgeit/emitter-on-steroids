@@ -1,5 +1,5 @@
 var emitter = require('../emitter');
-var StoppableEvent = require('../events').StoppableEvent;
+var Event   = require('../event');
 
 // === Synchronous listener ===
 
@@ -47,7 +47,7 @@ emitter()
   .on('test', function() {
     console.log('listener #2');
   })
-  .emit(new StoppableEvent('test'), function() {
+  .emit(Event.stoppable(new Event('test')), function() {
     console.log('done #4', arguments);
   })
 ;

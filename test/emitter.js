@@ -1,7 +1,6 @@
 var assert          = require('assert');
 var emitter         = require('..');
-var Event           = require('../events').Event;
-var StoppableEvent  = require('../events').StoppableEvent;
+var Event           = require('../event');
 
 describe('EventEmitter', function() {
 
@@ -296,7 +295,7 @@ describe('EventEmitter', function() {
         .on('test', function() {
           ++count;
         })
-        .emit(new StoppableEvent('test'), function(err, event) {
+        .emit(Event.stoppable(new Event('test')), function(err, event) {
           assert(event.isPropagationStopped());
         })
       ;
