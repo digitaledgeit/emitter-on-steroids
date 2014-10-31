@@ -40,7 +40,7 @@ function stopPropagation() {
  */
 function Event(name, emitter) {
   this.name     = name;
-  this.emitter  = null;
+  this.emitter  = emitter;
 }
 
 /**
