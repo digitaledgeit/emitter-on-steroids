@@ -1,6 +1,6 @@
 {
   "name": "emitter-on-steroids",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": "James Newell <james@digitaledgeit.com.au",
   "contributors": [],
   "keywords": ["event", "emitter", "listener", "dispatcher", "emit"],
@@ -8,7 +8,7 @@
   "main": "emitter.js",
   "repository": "https://github.com/digitaledgeit/js-emitter-on-steroids.git",
   "bugs": "https://github.com/digitaledgeit/js-emitter-on-steroids/issues",
-  "licenses": [{"type": "MIT", "url": "http://www.opensource.org/licenses/MIT"}],
+  "license": "MIT",
   "devDependencies": {
     "mocha": "^1.21.5"
   }
