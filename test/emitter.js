@@ -22,6 +22,27 @@ describe('EventEmitter', function() {
 
     });
 
+    it('the callback scope should be should be the emitter when sync', function() {
+      var ee = emitter();
+      ee
+        .on('test', function() {
+          assert.equal(this, ee);
+        })
+        .emit('test')
+      ;
+    })
+
+    it('the callback scope should be should be the emitter when async', function(done) {
+      var ee = emitter();
+      ee
+        .on('test', function(done) {
+          assert.equal(this, ee);
+          done();
+        })
+        .emit('test', done)
+      ;
+    })
+
   });
 
   // ===================================================================

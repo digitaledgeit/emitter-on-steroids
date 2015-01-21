@@ -14,14 +14,21 @@ function EventEmitter() {
   //if called as a function (and not a constructor) then create a new instance or mixin
   if (!(this instanceof EventEmitter)) {
     if (arguments.length === 0) {
+
+      //new instance
       return new EventEmitter();
+      
     } else {
+
+      //mixin
       for (var key in EventEmitter.prototype) {
         if (EventEmitter.prototype.hasOwnProperty(key)) {
           arguments[0][key] = EventEmitter.prototype[key];
         }
       }
+
       return arguments[0];
+
     }
   }
 
@@ -208,13 +215,13 @@ EventEmitter.prototype.emit = function() {
     //call the event listener synchronously or asynchronously
     if (callback.length <= args.length) {
       try {
-        callback.apply(this, args); //sync
+        callback.apply(self, args); //sync
         callNextListener();
       } catch(err) {
         callNextListener(err);
       }
     } else {
-      callback.apply(this, args.concat(callNextListener)); //async
+      callback.apply(self, args.concat(callNextListener)); //async
     }
 
   }
