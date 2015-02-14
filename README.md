@@ -55,7 +55,7 @@ are called before regular listeners.
 
 ### Formal events
 
-	var Event = require('emitter-on-steroids/events').Event;
+	var Event = require('emitter-on-steroids/event');
 
 	emitter()
 	  .on('test', function(event) { //the event object is passed as the first argument
@@ -65,7 +65,7 @@ are called before regular listeners.
 	    console.log('listener #2');
 	    done();
 	  })
-	  .emit(new StoppableEvent('test'), function(err, event) { //the event object is passed as the second argument
+	  .emit(Event.stoppable(new Event('test')), function(err, event) { //the event object is passed as the second argument
 
 	  })
 	;
