@@ -91,6 +91,7 @@ EventEmitter.prototype.once = function(name, listener) {
     self.off(name, once);
     listener.apply(this, arguments);
   }
+  once.argc = listener.length;
 
   this.on(name, once);
   return this;
@@ -213,7 +214,8 @@ EventEmitter.prototype.emit = function() {
     ++i;
 
     //call the event listener synchronously or asynchronously
-    if (callback.length <= args.length) {
+    var argc = callback.argc || callback.length;
+    if (argc <= args.length) {
       try {
         callback.apply(self, args); //sync
         callNextListener();

@@ -97,6 +97,21 @@ describe('EventEmitter', function() {
 
     });
 
+    it('should receive the `next` method for async listeners', function(done) {
+
+      emitter()
+        .once('test', function(next) {
+          assert.equal(typeof(next), 'function');
+          next();
+        })
+        .emit('test', function(err) {
+          assert.equal(err, undefined);
+          done();
+        })
+      ;
+
+    });
+
   });
 
   // ===================================================================
