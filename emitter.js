@@ -36,7 +36,7 @@ function EventEmitter() {
 
 /**
  * Get the registered listeners
- * @param   {String}    name        The event name
+ * @param   {string}    name        The event name
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.listeners = function(event){
@@ -54,8 +54,8 @@ EventEmitter.prototype.listeners = function(event){
 
 /**
  * Add an event listener
- * @param   {String}    name        The event name
- * @param   {Function}  listener    The event listener
+ * @param   {string}    name        The event name
+ * @param   {function}  listener    The event listener
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.on = function(name, listener) {
@@ -79,8 +79,8 @@ EventEmitter.prototype.on = function(name, listener) {
 
 /**
  * Add an event listener that listens to a single event before removing itself
- * @param   {String}                                name        The event name
- * @param   {Function(Event, [Function([Error])]}   listener    The event listener
+ * @param   {string}                                name        The event name
+ * @param   {function(Event, [function([Error])]}   listener    The event listener
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.once = function(name, listener) {
@@ -99,8 +99,8 @@ EventEmitter.prototype.once = function(name, listener) {
 
 /**
  * Remove an event listener
- * @param   {String}                                name        The event name
- * @param   {Function(Event, [Function([Error])]}   listener    The event listener
+ * @param   {string}                                name        The event name
+ * @param   {function(Event, [function([Error])]}   listener    The event listener
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.off = function(name, listener) {
@@ -124,7 +124,7 @@ EventEmitter.prototype.off = function(name, listener) {
  * Emit an event
  * @param   {String|Event}                          event
  * @param   {...[*]}                                [args]
- * @param   {Function(Error, [Event])}              [done]
+ * @param   {function(Error, [Event])}              [done]
  * @returns {EventEmitter}
  */
 EventEmitter.prototype.emit = function() {
